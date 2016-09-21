@@ -13,21 +13,27 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     TextView tw;
     Calendar c;
-    private ArrayList<Float> sensorValues = new ArrayList<>();
+    private ArrayList<Integer> sensorValues = new ArrayList<>();
     private SensorManager mSensorManager;
     private SensorEventListener mEventListenerLight;
-    private float lastLightValue;
+    private int lastLightValue;
 
     private void updateUI(){
         runOnUiThread(new Runnable() {
@@ -56,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 float[] values = event.values;
-                lastLightValue = values[0];
+                lastLightValue = (int)values[0];
                 sensorValues.add(lastLightValue);
                 Log.i("SENSOR_CHANGED",Float.toString(lastLightValue));
                 updateUI();
@@ -70,12 +76,19 @@ public class MainActivity extends AppCompatActivity {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                c = Calendar.getInstance();
-                Log.i("SEND_DATA",Integer.toString(c.get(Calendar.SECOND)));
-                sendRequest();
+                if (sensorValues.size() > 10) {
+                    int avgLxValue = 0;
+                    for (int i = sensorValues.size() - 10; i < sensorValues.size(); i++) {
+                        avgLxValue = avgLxValue + sensorValues.get(i);
+                    }
+                    Log.i("avgLxValue", Float.toString(avgLxValue / 10));
+//                sendGetRequest();
+                    sendPostRequest(avgLxValue / 10);
+                }
             }
-        }, 0, 3000);
+        }, 0, 5000);
     }
+
 
     @Override
     protected void onResume() {
@@ -83,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    private void sendRequest(){
+    private void sendGetRequest(){
         RequestQueue queue = Volley.newRequestQueue(this);
         String url ="http://www.google.com";
         // Request a string response from the provided URL.
@@ -102,5 +115,34 @@ public class MainActivity extends AppCompatActivity {
         });
 // Add the request to the RequestQueue.
         queue.add(stringRequest);
+    }
+
+    private void sendPostRequest(float value){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        final String URL = "http://192.168.0.28:3002/sensorinput";
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id", "1");
+        params.put("value", Float.toString(value));
+
+        JsonObjectRequest req = new JsonObjectRequest(URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            VolleyLog.v("Response:%n %s", response.toString(4));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("Error: ", error.getMessage());
+            }
+        });
+
+// add the request object to the queue to be executed
+        queue.add(req);
     }
 }

@@ -7,7 +7,10 @@ import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private SensorManager mSensorManager;
     private SensorEventListener mEventListenerLight;
     private int lastLightValue;
+    private boolean isSensorStarted = false;
 
     private void updateUI(){
         runOnUiThread(new Runnable() {
@@ -54,8 +58,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Button startButton = (Button) findViewById(R.id.startB);
         tw = (TextView) findViewById(R.id.textArea);
+
+        startButton.setOnClickListener(new View.OnClickListener() {
+            TextView sensorID = (TextView) findViewById(R.id.sensorID);
+            @Override
+            public void onClick(View v) {
+                addToast("sensor started");
+                isSensorStarted = true;
+                new Timer().scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (sensorValues.size() > 10) {
+                            int avgLxValue = 0;
+                            for (int i = sensorValues.size() - 10; i < sensorValues.size(); i++) {
+                                avgLxValue = avgLxValue + sensorValues.get(i);
+                            }
+                            Log.i("avgLxValue", Float.toString(avgLxValue / 10));
+                            sendPostRequest((avgLxValue / 10), sensorID.getText().toString());
+                        }
+                    }
+                }, 0, 5000);
+            }
+        });
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mEventListenerLight = new SensorEventListener() {
@@ -65,28 +91,15 @@ public class MainActivity extends AppCompatActivity {
                 lastLightValue = (int)values[0];
                 sensorValues.add(lastLightValue);
                 Log.i("SENSOR_CHANGED",Float.toString(lastLightValue));
-                updateUI();
+                if(isSensorStarted) {
+                    updateUI();
+                }
             }
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
             }
         };
-
-        new Timer().scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (sensorValues.size() > 10) {
-                    int avgLxValue = 0;
-                    for (int i = sensorValues.size() - 10; i < sensorValues.size(); i++) {
-                        avgLxValue = avgLxValue + sensorValues.get(i);
-                    }
-                    Log.i("avgLxValue", Float.toString(avgLxValue / 10));
-//                sendGetRequest();
-                    sendPostRequest(avgLxValue / 10);
-                }
-            }
-        }, 0, 5000);
     }
 
 
@@ -117,12 +130,12 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    private void sendPostRequest(float value){
+    private void sendPostRequest(float value, String id){
         RequestQueue queue = Volley.newRequestQueue(this);
         final String URL = "http://192.168.0.28:3002/sensorinput";
 
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("id", "1");
+        params.put("id", id);
         params.put("value", Float.toString(value));
 
         JsonObjectRequest req = new JsonObjectRequest(URL, new JSONObject(params),
@@ -144,5 +157,10 @@ public class MainActivity extends AppCompatActivity {
 
 // add the request object to the queue to be executed
         queue.add(req);
+    }
+
+    private void addToast(String text){
+        Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
+        toast.show();
     }
 }

@@ -132,7 +132,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendPostRequest(float value, String id){
         RequestQueue queue = Volley.newRequestQueue(this);
-        final String URL = "http://192.168.0.28:3002/sensorinput";
+//        final String URL = "http://192.168.0.28:3002/sensorinput"; Home Wifi
+        final String URL = "http://192.168.1.100:3002" +
+                "/sensorinput"; //Linksys router
 
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("id", id);

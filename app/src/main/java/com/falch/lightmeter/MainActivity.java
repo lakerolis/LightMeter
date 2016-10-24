@@ -9,8 +9,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -60,6 +63,64 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Button startButton = (Button) findViewById(R.id.startB);
         tw = (TextView) findViewById(R.id.textArea);
+
+        final ToggleButton onOff = (ToggleButton) findViewById(R.id.toggleButton);
+        Button redButton = (Button) findViewById(R.id.button2);
+        Button blueButton = (Button) findViewById(R.id.button3);
+        Button resetButton = (Button) findViewById(R.id.button4);
+        SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar4);
+
+        onOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!isChecked){
+                    onOff.setText("off");
+                    sendRawPostRequest("{\"on\":true}");
+                }else{
+                    onOff.setText("on");
+                    sendRawPostRequest("{\"on\":false}");
+                }
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendRawPostRequest("{\"on\":true,\"xy\":[0.3227,0.329],\"bri\":255}");
+            }
+        });
+
+        redButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendRawPostRequest("{\"on\":true,\"xy\":[0.7,0.2986]}");
+            }
+        });
+
+        blueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendRawPostRequest("{\"on\":true,\"xy\":[0.139,0.081]}");
+            }
+        });
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            int progress = 0;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                this.progress = progress;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                sendRawPostRequest("{\"bri\":"+progress+"}");
+            }
+        });
 
         startButton.setOnClickListener(new View.OnClickListener() {
             TextView sensorID = (TextView) findViewById(R.id.sensorID);
@@ -130,6 +191,32 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
+    private void sendRawPostRequest(String input){
+        RequestQueue queue = Volley.newRequestQueue(this);
+        final String URL = "http://192.168.1.100:3002/sensorinput";
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("id","1337");
+        params.put("value",input);
+
+        JsonObjectRequest req = new JsonObjectRequest(URL, new JSONObject(params),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            VolleyLog.v("Response:%n %s", response.toString(4));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.e("Error: ", error.getMessage());
+            }
+        });
+        queue.add(req);
+    }
+
     private void sendPostRequest(float value, String id){
         RequestQueue queue = Volley.newRequestQueue(this);
 //        final String URL = "http://192.168.0.28:3002/sensorinput"; Home Wifi
@@ -156,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
                 VolleyLog.e("Error: ", error.getMessage());
             }
         });
-
-// add the request object to the queue to be executed
         queue.add(req);
     }
 

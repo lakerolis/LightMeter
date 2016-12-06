@@ -21,15 +21,27 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:text="Lighting Profile"
+                android:ems="10"
+                android:layout_span="4"
+                android:id="@+id/editText2"
+                android:singleLine="false"
+                android:selectAllOnFocus="false" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
             <Button
                 android:text="Blå"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/button3"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
-
+                android:id="@+id/button3"/>
             <Button
                 android:text="Rød"
                 android:layout_width="wrap_content"
@@ -39,18 +51,32 @@
                 android:layout_alignLeft="@+id/textArea"
                 android:layout_alignStart="@+id/textArea" />
 
-            <ToggleButton
-                android:text="ToggleButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/toggleButton" />
-
             <Button
                 android:text="Default"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/button4" />
 
+            <ToggleButton
+                android:text="ToggleButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/toggleButton" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:text="Brightness"
+                android:layout_span="4"
+                android:ems="10"
+                android:id="@+id/editText5" />
         </TableRow>
 
         <TableRow

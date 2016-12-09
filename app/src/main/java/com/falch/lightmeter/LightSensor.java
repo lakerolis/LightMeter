@@ -39,14 +39,14 @@ public class LightSensor extends Activity implements SensorEventListener {
     }
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         if(sensor.getType() == Sensor.TYPE_LIGHT){
-            Log.i("Sensor Changed", "Accuracy :" + accuracy);
+//            Log.i("Sensor Changed", "Accuracy :" + accuracy);
         }
 
     }
 
     public void onSensorChanged(SensorEvent event) {
         if( event.sensor.getType() == Sensor.TYPE_LIGHT){
-            Log.i("Sensor Changed", "onSensor Change :" + event.values[0]);
+//            Log.i("Sensor Changed", "onSensor Change :" + event.values[0]);
             sensorValue = event.values[0];
         }
     }

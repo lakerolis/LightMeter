@@ -29,8 +29,9 @@
                 android:ems="10"
                 android:layout_span="4"
                 android:id="@+id/editText2"
-                android:singleLine="false"
-                android:selectAllOnFocus="false" />
+                android:selectAllOnFocus="false"
+                android:focusable="false"
+                android:clickable="false" />
         </TableRow>
 
         <TableRow
@@ -38,30 +39,34 @@
             android:layout_height="match_parent" >
 
             <Button
-                android:text="Blå"
+                android:text="Relax"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/button3"/>
+                android:id="@+id/button3"
+                android:textSize="12sp" />
             <Button
-                android:text="Rød"
+                android:text="Concentrate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/button2"
                 android:layout_alignParentTop="true"
                 android:layout_alignLeft="@+id/textArea"
-                android:layout_alignStart="@+id/textArea" />
+                android:layout_alignStart="@+id/textArea"
+                android:textSize="12sp" />
 
             <Button
                 android:text="Default"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/button4" />
+                android:id="@+id/button4"
+                android:textSize="12sp" />
 
             <ToggleButton
                 android:text="ToggleButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/toggleButton" />
+                android:id="@+id/toggleButton"
+                android:textSize="12sp" />
 
         </TableRow>
 
@@ -74,9 +79,11 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:text="Brightness"
+                android:focusable="false"
+                android:clickable="false"
                 android:layout_span="4"
                 android:ems="10"
-                android:id="@+id/editText5" />
+                android:id="@+id/editText5"/>
         </TableRow>
 
         <TableRow
@@ -122,16 +129,43 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <TextView
+            <EditText
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Light value is:"
-                android:id="@+id/textArea"
-                android:textAlignment="center"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="181dp" />
+                android:inputType="textPersonName"
+                android:text="http://192.168.0.21:3000"
+                android:ems="10"
+                android:layout_span="4"
+                android:id="@+id/ip" />
+
         </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+        </TableRow>
+
     </TableLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Light value is:"
+            android:height="600px"
+            android:id="@+id/textArea"
+            android:textAlignment="center"
+            android:layout_span="4"
+            android:layout_marginRight="122dp"
+            android:layout_marginEnd="122dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="294dp" />
+    </RelativeLayout>
 
 </RelativeLayout>

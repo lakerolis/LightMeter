@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         Button redButton = (Button) findViewById(R.id.button2);
         Button blueButton = (Button) findViewById(R.id.button3);
         Button resetButton = (Button) findViewById(R.id.button4);
+        final EditText ipText = (EditText) findViewById(R.id.ip);
         SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar4);
 
         onOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -75,10 +77,10 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(!isChecked){
                     onOff.setText("off");
-                    sendRawPostRequest("{\"on\":true}");
+                    sendRawPostRequest("{\"on\":true}",ipText.getText().toString());
                 }else{
                     onOff.setText("on");
-                    sendRawPostRequest("{\"on\":false}");
+                    sendRawPostRequest("{\"on\":false}",ipText.getText().toString());
                 }
             }
         });
@@ -86,21 +88,24 @@ public class MainActivity extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendRawPostRequest("{\"on\":true,\"xy\":[0.3227,0.329],\"bri\":255}");
+//                sendRawPostRequest("{\"on\":true,\"xy\":[0.3227,0.329],\"bri\":255}",ipText.getText().toString());
+                sendRawPostRequest("{\"on\":true,\"xy\":[0.4448,0.406],\"bri\":254,\"sat\":121,\"hue\":15342}",ipText.getText().toString());
             }
         });
 
         redButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendRawPostRequest("{\"on\":true,\"xy\":[0.7,0.2986]}");
+//                sendRawPostRequest("{\"on\":true,\"xy\":[0.7,0.2986]}",ipText.getText().toString());
+                sendRawPostRequest("{\"on\":true,\"xy\":[0.3689,0.3719],\"bri\":254,\"sat\":53,\"hue\":33016}",ipText.getText().toString());
             }
         });
 
         blueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendRawPostRequest("{\"on\":true,\"xy\":[0.139,0.081]}");
+//                sendRawPostRequest("{\"on\":true,\"xy\":[0.139,0.081]}",ipText.getText().toString());
+                sendRawPostRequest("{\"on\":true,\"xy\":[0.5017,0.4152],\"bri\":144,\"sat\":200,\"hue\":13524}",ipText.getText().toString());
             }
         });
 
@@ -118,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                sendRawPostRequest("{\"bri\":"+progress+"}");
+                sendRawPostRequest("{\"bri\":"+progress+"}",ipText.getText().toString());
             }
         });
 
@@ -137,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                                 avgLxValue = avgLxValue + sensorValues.get(i);
                             }
                             Log.i("avgLxValue", Float.toString(avgLxValue / 10));
-                            sendPostRequest((avgLxValue / 10), sensorID.getText().toString());
+                            sendPostRequest((avgLxValue / 10), sensorID.getText().toString(),ipText.getText().toString());
                         }
                     }
                 }, 0, 5000);
@@ -151,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 float[] values = event.values;
                 lastLightValue = (int)values[0];
                 sensorValues.add(lastLightValue);
-                Log.i("SENSOR_CHANGED",Float.toString(lastLightValue));
+//                Log.i("SENSOR_CHANGED",Float.toString(lastLightValue));
                 if(isSensorStarted) {
                     updateUI();
                 }
@@ -191,12 +196,15 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    private void sendRawPostRequest(String input){
+    private void sendRawPostRequest(String input, String ip){
         RequestQueue queue = Volley.newRequestQueue(this);
-        final String URL = "http://192.168.1.100:3002/sensorinput";
+//        final String URL = "http://192.168.1.100:3002/sensorinput";
+        final String URL = ip + "/sensorinput"; //custom ip
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("id","1337");
         params.put("value",input);
+
+        Log.i("IP FROM TEXTFIELD","ip: "+ip);
 
         JsonObjectRequest req = new JsonObjectRequest(URL, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -217,11 +225,13 @@ public class MainActivity extends AppCompatActivity {
         queue.add(req);
     }
 
-    private void sendPostRequest(float value, String id){
+    private void sendPostRequest(float value, String id, String ip){
         RequestQueue queue = Volley.newRequestQueue(this);
 //        final String URL = "http://192.168.0.28:3002/sensorinput"; Home Wifi
-        final String URL = "http://192.168.1.100:3002" +
-                "/sensorinput"; //Linksys router
+//        final String URL = "http://192.168.1.100:3002" +
+//                "/sensorinput"; //Linksys router
+        final String URL = ip + "/sensorinput"; //custom ip
+        Log.i("IP FROM TEXTFIELD","ip: "+ip);
 
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("id", id);
